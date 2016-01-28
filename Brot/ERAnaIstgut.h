@@ -47,6 +47,13 @@ namespace ertool {
 
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
+    
+  private:
+    
+    // Number of in TPC neutrinos
+    unsigned int _inTPC;
+    // Number of out of TPC neutrinos
+    unsigned int _outTPC;
 
   };
 }

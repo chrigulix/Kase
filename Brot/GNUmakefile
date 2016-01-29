@@ -12,7 +12,7 @@ OBJECTS = $(SOURCES:.cxx=.o)
 
 # include options for this package
 INCFLAGS  = -I.                       #Include itself
-INCFLAGS += $(shell seltool-config --includes)
+INCFLAGS += $(shell seltool-config --includes) 
 
 # platform-specific options
 OSNAME          = $(shell uname -s)

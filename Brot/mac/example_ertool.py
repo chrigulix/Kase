@@ -24,10 +24,10 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_proc.set_ana_output_file("ertool_hist.root")
 
 # Create ERTool algorithm (empty base class for this example)
-my_algo = ertool.AlgoBase()
+#my_algo = ertool.AlgoBase()
 
 # Create ERTool analysis (empty base class for this example)
-my_ana = ertool.AnaBase()
+my_ana = ertool.ERAnaIstgut()
 
 # Create larlite interfce analysis unit for ERTool
 my_anaunit = fmwk.ExampleERSelection()
@@ -37,10 +37,10 @@ my_anaunit = fmwk.ExampleERSelection()
 # Second Argument: producer module label
 my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
-my_anaunit.SetVtxProducer(True,"generator");
+#my_anaunit.SetVtxProducer(True,"generator");
 
 # Implement manager
-my_anaunit._mgr.AddAlgo(my_algo)
+#my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAna(my_ana)
 my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_anaunit)

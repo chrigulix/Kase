@@ -24,15 +24,36 @@ namespace ertool {
   {
     _inTPC = 0;
     _outTPC =0;
+    
+    auto DetGeometry = ::larutil::Geometry::GetME();
+    
+    DetectorBox = geoalgo::AABox(0.0,-DetGeometry->DetHalfHeight(),0.0,2*DetGeometry->DetHalfWidth(),DetGeometry->DetHalfHeight(),DetGeometry->DetLength());
   }
 
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &ps)
   {
-    for(auto const & particle : ps.GetPrimaryNodes(RecoType_t::kInvisible))
+    for(auto const & particle : ps.GetParticleNodes(RecoType_t::kTrack))
     {
-      ps.
-      std::cout << particle. << std::endl;
+      auto const & Track = data.Track(ps.GetParticle(particle).RecoID());
+      std::cout << ps.GetParticle(particle).PdgCode() << std::endl;
+      std::cout << "hello" << std::endl;
+      
+      if(ps.GetParticle(particle).PdgCode() == 12)
+      {
+	// Check if the particle is originating in the TPC
+	if(DetectorBox.Contain(Track.front()))
+	{
+	  std::cout << "Is inside" << std::endl;
+	}
+	
+      }
     }
+//     for(auto const & particle : ps.GetPrimaryNodes(RecoType_t::kInvisible))
+//     {
+//       auto const & neutrals = data.Track(ps.GetParticle(particle).RecoID());
+      
+//       std::cout << ps.GetParticle(particle).PdgCode() << std::endl;
+//     }
     return true; 
   }
 

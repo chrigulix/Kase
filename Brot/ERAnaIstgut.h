@@ -16,6 +16,8 @@
 #define ERTOOL_ERANAISTGUT_H
 
 #include "ERTool/Base/AnaBase.h"
+#include "LArUtil/Geometry.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {
 
@@ -54,6 +56,9 @@ namespace ertool {
     unsigned int _inTPC;
     // Number of out of TPC neutrinos
     unsigned int _outTPC;
+    
+    // Detector Box object
+    geoalgo::AABox DetectorBox;
 
   };
 }

@@ -32,13 +32,19 @@ namespace ertool {
 
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &ps)
   {
-    for(auto const & particle : ps.GetParticleNodes(RecoType_t::kTrack))
+    auto const& mc_graph = MCParticleGraph();
+    // Get the MC data
+    auto const& mc_data = MCEventData();
+    
+    
+    
+    for(auto const & particle :  mc_graph.GetParticleArray())
     {
-      auto const & Track = data.Track(ps.GetParticle(particle).RecoID());
-      std::cout << ps.GetParticle(particle).PdgCode() << std::endl;
-      std::cout << "hello" << std::endl;
+      auto const & Track = mc_data.Track(particle.RecoID());
+//       std::cout << particle.PdgCode() << std::endl;
+//       std::cout << "hello" << std::endl;
       
-      if(ps.GetParticle(particle).PdgCode() == 12)
+      if(particle.PdgCode() == 12)
       {
 	// Check if the particle is originating in the TPC
 	if(DetectorBox.Contain(Track.front()))

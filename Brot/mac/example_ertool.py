@@ -39,6 +39,8 @@ my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
 
+my_anaunit._mgr._mc_for_ana = True
+
 # Implement manager
 #my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAna(my_ana)

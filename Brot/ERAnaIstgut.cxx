@@ -32,6 +32,7 @@ namespace ertool {
 
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &ps)
   {
+    // Get the MC graph
     auto const& mc_graph = MCParticleGraph();
     // Get the MC data
     auto const& mc_data = MCEventData();
@@ -41,16 +42,16 @@ namespace ertool {
     for(auto const & particle :  mc_graph.GetParticleArray())
     {
       auto const & Track = mc_data.Track(particle.RecoID());
-//       std::cout << particle.PdgCode() << std::endl;
+      std::cout << particle.PdgCode() << std::endl;
 //       std::cout << "hello" << std::endl;
       
       if(particle.PdgCode() == 12)
       {
 	// Check if the particle is originating in the TPC
-	if(DetectorBox.Contain(Track.front()))
-	{
-	  std::cout << "Is inside" << std::endl;
-	}
+// 	if(DetectorBox.Contain(Track.front()))
+// 	{
+// 	  std::cout << "Is inside" << std::endl;
+// 	}
 	
       }
     }

@@ -51,8 +51,8 @@ namespace ertool {
       }
       else if(particle.RecoType() == RecoType_t::kTrack)
       {
-        auto const flash = mc_data.Flash(particle.FlashID ());
-        std::cout << "time:  " << flash._t << std::endl;
+//         auto const flash = mc_data.Flash(particle.FlashID ());
+//         std::cout << "time:  " << flash._t << std::endl;
         
 	auto const track = mc_data.Track(particle);
 	std::cout << "Track " << track.front() << std::endl;

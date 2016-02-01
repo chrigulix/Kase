@@ -1,4 +1,4 @@
-import sys
+import sys, os
 
 # Kazu's temporary hack! 
 #from ROOT import gSystem
@@ -14,12 +14,17 @@ if len(sys.argv) < 2:
     msg += '\n'
     sys.stderr.write(msg)
     sys.exit(1)
-
-from seltool import ertool
-from larlite import larlite as fmwk
+    
+from ROOT import gSystem
+from ROOT import larlite as fmwk
+from ROOT import ertool
+from singleE_config import GetERSelectionInstance
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
+my_proc.enable_filter(True)
+
+use_reco = True if sys.argv[1] == 'reco' else False
 
 # Set input root file
 for x in xrange(len(sys.argv)-1):
@@ -38,20 +43,19 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 my_ana = ertool.ERAnaIstgut()
 
 # Create larlite interfce analysis unit for ERTool
-my_anaunit = fmwk.ExampleERSelection()
+my_anaunit = GetERSelectionInstance()
 
-# Set Producers
-# First Argument: True = MC, False = Reco
-# Second Argument: producer module label
+my_anaunit._mgr.ClearCfgFile()
+my_anaunit._mgr.AddCfgFile(os.environ['LARLITE_USERDEVDIR']+'/SelectionTool/ERTool/dat/ertool_default%s.cfg'%('_reco' if use_reco else ''))
 
-my_anaunit.SetShowerProducer(True,"mcreco");
-my_anaunit.SetTrackProducer(True,"mcreco");
-my_anaunit.SetFlashProducer("opflash")
+if use_reco:
+    my_anaunit.SetShowerProducer(False,'showerrecofuzzy')
+    my_anaunit.SetTrackProducer(False,'stitchkalmanhitcc')
 
 #my_anaunit.SetVtxProducer(True,"generator");
 
 #my_anaunit._mgr._mc_for_ana = True
-my_anaunit._mgr._profile_mode = True
+#my_anaunit._mgr._profile_mode = True
 
 # Implement manager
 #my_anaunit._mgr.AddAlgo(my_algo)

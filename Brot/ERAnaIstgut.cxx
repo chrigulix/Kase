@@ -53,14 +53,22 @@ namespace ertool {
       {
 	auto const track = mc_data.Track(particle);
 	std::cout << "Track " << track.front() << std::endl;
-	if(particle.PdgCode() == 12)
+	if(DetectorBox.Contain(track.front()))
+	{
+	    std::cout << "Is inside" << std::endl;
+	}
+      }
+      else if(particle.RecoType() == RecoType_t::kInvisible)
+      {
+	auto const invisible = mc_data.Track(particle);
+	if(particle.PdgCode() == 14)
 	{
 	  // Check if the particle is originating in the TPC
-	  if(DetectorBox.Contain(track.front()))
+	  if(DetectorBox.Contain(invisible.front()))
 	  {
 	    std::cout << "Is inside" << std::endl;
 	  }
-	}	
+	}
       }
     }
 //     for(auto const & particle : ps.GetPrimaryNodes(RecoType_t::kInvisible))

@@ -24,7 +24,7 @@ namespace ertool {
   /**
      \class ERAnaIstgut
      User custom Analysis class made by kazuhiro
-   **/
+   */
   class ERAnaIstgut : public AnaBase {
   
   public:

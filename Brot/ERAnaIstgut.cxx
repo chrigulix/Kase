@@ -29,15 +29,24 @@ namespace ertool {
     DetectorBox = geoalgo::AABox(0.0,-DetGeometry->DetHalfHeight(),0.0,2*DetGeometry->DetHalfWidth(),DetGeometry->DetHalfHeight(),DetGeometry->DetLength());
   }
 
-  bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &ps)
+  bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &graph)
   {
     // Get the MC graph
-    std::cout << "starting loop: " << ps.GetNumParticles() << std::endl;
+    std::cout << "starting loop: " << graph.GetNumParticles() << std::endl;
         
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     // Get the MC data
     auto const& mc_data = MCEventData();
+    
+    for(auto const & particle : graph.GetParticleArray())
+    {
+      if(particle.RecoType() == RecoType_t::kTrack)
+      {
+	auto const flash = data.Track(particle);
+	std::cout << "time:  " << flash._time << std::endl;
+      }
+    }
     
     // Loop over particle array
     for(auto const & particle : mc_graph.GetParticleArray())

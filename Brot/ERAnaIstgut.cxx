@@ -22,15 +22,16 @@ namespace ertool {
 
   void ERAnaIstgut::ProcessBegin()
   {
+    auto DetGeometry = ::larutil::Geometry::GetME();
+    Detector = geoalgo::AABox(0.0,-DetGeometry->DetHalfHeight(),0.0,2*DetGeometry->DetHalfWidth(),DetGeometry->DetHalfHeight(),DetGeometry->DetLength());
     _inTPC = 0;
     _outTPC =0;
   }
 
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &ps)
   {
-    std::cout << "starting loop: " << ps.GetNumParticles() << std::endl;
-    std::cout << "array: "  << std::endl;
-        
+    std::cout << " ---------- starting loop: -------------" << std::endl;
+
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     // Get the MC data
@@ -39,13 +40,15 @@ namespace ertool {
     for(auto const & particle : mc_graph.GetParticleArray())
     {
         
-        std::cout << "out1 " << particle.PdgCode() <<  " ";
+        std::cout << "ID " << particle.ID() << " PDG: " << particle.PdgCode() << std::endl;
 
         
         if ( particle.RecoType() == RecoType_t::kShower )
         {
             auto const shower = mc_data.Shower(particle);
             std::cout << "Shower " << shower.Start() << std::endl;
+            
+            
         }
         
         if (particle.RecoType() == RecoType_t::kTrack)

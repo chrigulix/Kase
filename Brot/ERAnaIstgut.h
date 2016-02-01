@@ -16,6 +16,8 @@
 #define ERTOOL_ERANAISTGUT_H
 
 #include "ERTool/Base/AnaBase.h"
+#include "LArUtil/Geometry.h"
+#include "GeoAlgo/GeoAlgo.h"
 
 namespace ertool {
 
@@ -49,7 +51,11 @@ namespace ertool {
     void ProcessEnd(TFile* fout=nullptr);
     
   private:
-    
+      
+      geoalgo::AABox Detector;
+      const ::larutil::Geometry *geom = ::larutil::Geometry::GetME();
+
+      
     // Number of in TPC neutrinos
     unsigned int _inTPC;
     // Number of out of TPC neutrinos

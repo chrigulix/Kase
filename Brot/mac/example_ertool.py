@@ -29,7 +29,7 @@ for x in xrange(len(sys.argv)-1):
 my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 
 # Specify output root file name
-my_proc.set_ana_output_file("ertool_hist.root")
+#my_proc.set_ana_output_file("ertool_hist.root")
 
 # Create ERTool algorithm (empty base class for this example)
 #my_algo = ertool.AlgoBase()
@@ -43,6 +43,7 @@ my_anaunit = fmwk.ExampleERSelection()
 # Set Producers
 # First Argument: True = MC, False = Reco
 # Second Argument: producer module label
+
 my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
 #my_anaunit.SetVtxProducer(True,"generator");
@@ -52,7 +53,7 @@ my_anaunit._mgr._mc_for_ana = True
 # Implement manager
 #my_anaunit._mgr.AddAlgo(my_algo)
 my_anaunit._mgr.AddAna(my_ana)
-my_ana._mode =True # True = Select. False = Fill mode
+#my_ana._mode =True # True = Select. False = Fill mode
 my_proc.add_process(my_anaunit)
 
 # run!

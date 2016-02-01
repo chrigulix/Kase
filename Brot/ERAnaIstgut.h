@@ -16,6 +16,7 @@
 #define ERTOOL_ERANAISTGUT_H
 
 #include "ERTool/Base/AnaBase.h"
+#include "ERTool/Base/Flash.h"
 #include "LArUtil/Geometry.h"
 #include "GeoAlgo/GeoAlgo.h"
 

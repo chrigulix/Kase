@@ -46,6 +46,8 @@ my_anaunit = fmwk.ExampleERSelection()
 
 my_anaunit.SetShowerProducer(True,"mcreco");
 my_anaunit.SetTrackProducer(True,"mcreco");
+my_anaunit.SetFlashProducer('opflash')
+
 #my_anaunit.SetVtxProducer(True,"generator");
 
 my_anaunit._mgr._mc_for_ana = True

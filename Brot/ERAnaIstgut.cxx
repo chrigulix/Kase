@@ -34,8 +34,8 @@ namespace ertool {
     double D = (DetGeometry->CryostatLength() - DetGeometry->DetLength())/2.0;
     
     Cryostat = geoalgo::Cylinder(DetGeometry->DetHalfWidth(), 0.0, -D,
-                                 0.0, 0.0, DetGeometry->CryostatLength (),
-                                 150.0); //DetGeometry->CryostatHalfHeight());
+                                 DetGeometry->DetHalfWidth(), 0.0, DetGeometry->CryostatLength (),
+                                 DetGeometry->CryostatHalfHeight());
                                                 
   }
 

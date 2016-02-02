@@ -20,6 +20,9 @@ from ROOT import larlite as fmwk
 from ROOT import ertool
 from singleE_config import GetERSelectionInstance
 
+from seltool.erviewer import ERViewer
+from seltool.algoviewer import viewAll
+
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
 my_proc.enable_filter(True)
@@ -64,8 +67,27 @@ my_anaunit._mgr.AddAna(my_ana)
 my_proc.add_process(my_anaunit)
 
 # run!
-my_proc.run()
+#my_proc.run()
 
+mcviewer   = ERViewer('MC Info')
+mcviewer.use_box(True)
+recoviewer = ERViewer('RECO Info')
+recoviewer.use_box(True)
+
+# start event-by-event loop
+counter = 0
+while (my_proc.process_event(counter)):
+    print "Processing event {0}".format(counter)
+    data_reco = my_anaunit.GetData()
+    part_reco = my_anaunit.GetParticles()
+    data_mc   = my_anaunit.GetData(True)
+    part_mc   = my_anaunit.GetParticles(True)
+    viewAll(mcviewer, data_mc, part_mc,
+            recoviewer, data_reco, part_reco)
+    try:
+        counter = input('Hit Enter to continue to next evt, or type in an event number to jump to that event:')
+    except SyntaxError:
+        counter = counter + 1
 # done!
 print
 print "Finished running ana_processor event loop!"

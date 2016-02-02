@@ -55,7 +55,7 @@ def GetERSelectionInstance():
 	#Ecut = 20 #temporary trying this to see if it helps pi0 mids at low energy
 
 	anaunit = fmwk.ExampleERSelection()
-	anaunit.setDisableXShift(False)
+	anaunit.setDisableXShift(True)
 
 	#By default for now using mcreco
 	anaunit.SetShowerProducer(True,'mcreco')

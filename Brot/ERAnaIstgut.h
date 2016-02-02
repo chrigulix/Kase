@@ -19,6 +19,7 @@
 #include "ERTool/Base/Flash.h"
 #include "LArUtil/Geometry.h"
 #include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoCylinder.h"
 
 namespace ertool {
 
@@ -60,6 +61,7 @@ namespace ertool {
     
     // Detector Box object
     geoalgo::AABox DetectorBox;
+    geoalgo::Cylinder Cryostat;
 
   };
 }

@@ -42,12 +42,14 @@ namespace ertool {
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &graph)
   {
     // Get the MC graph
-    std::cout << " --------- starting loop: --------------" << std::endl;
+//     std::cout << " --------- starting loop: --------------" << std::endl;
         
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     // Get the MC data
     auto const& mc_data = MCEventData();
+    
+//     std::cout << mc_graph.Diagram() << std::endl;
     
     // Loop over particle set
     for(auto const & particle : graph.GetParticleArray())
@@ -80,27 +82,30 @@ namespace ertool {
       else if(particle.RecoType() == RecoType_t::kInvisible)
       {
  	//auto const invisible = mc_data.Shower(particle);
-	if(particle.PdgCode() == 11)
+	if(particle.PdgCode() == 14)
 	{
 	  // Check if the particle is originating in the TPC        
 	  if(DetectorBox.Contain(particle.Vertex()))
 	  {
-	    std::cout << "Is inside TPC" << particle.Vertex() << std::endl;
+// 	    std::cout << "Is inside TPC" << particle.Vertex() << std::endl;
 	    InTPCEnergy.push_back(particle.Energy());
 	  }
 	  else
 	  {
-	    std::cout << "Is outside TPC" << particle.Vertex() << std::endl;
+// 	    std::cout << "Is outside TPC" << particle.Vertex() << std::endl;
             
             // Check if the particle is originating in the Cryostat 
             if(Cryostat.Contain (particle.Vertex ()))
 	    {
-                std::cout << "Is inside Cryostat " << particle.Vertex() << std::endl;
+//                 std::cout << "Is inside Cryostat " << particle.Vertex() << std::endl;
 		InCryostatEnergy.push_back(particle.Energy());
+		XVertex.push_back(particle.Vertex().at(0));
+		YVertex.push_back(particle.Vertex().at(1));
+		ZVertex.push_back(particle.Vertex().at(2));
 	    }
             else 
 	    {
-                std::cout << "Is outside Cryostat " << particle.Vertex() << std::endl;
+//                 std::cout << "Is outside Cryostat " << particle.Vertex() << std::endl;
 		OutsideEnergy.push_back(particle.Energy());
 	    }
 	  }
@@ -121,11 +126,17 @@ namespace ertool {
   { 
     fout = new TFile("Kasebrot.root","RECREATE");
     fout->cd();
-    TH1F* hInTPC = new TH1F("In TPC","In TPC",20,0,3000);
-    TH1F* hInCryo = new TH1F("In Cryo","In Cryo",20,0,3000);
-    TH1F* hOut = new TH1F("Outside","Outside",20,0,3000);
+    TH1F* hInTPC = new TH1F("In TPC","In TPC",40,0,4000);
+    TH1F* hInCryo = new TH1F("In Cryo","In Cryo",40,0,4000);
+    TH1F* hOut = new TH1F("Outside","Outside",40,0,4000);
+    
+    TH1F* hX = new TH1F("x position","x position",356,-50,306);
+    TH1F* hY = new TH1F("y position","y position",333,-166.5,166.5);
+    TH1F* hZ = new TH1F("z position","z position",1235,-100,1135);
+    
     for(auto & event : InTPCEnergy)
     {
+//       std::cout << event << std::endl;
       hInTPC->Fill(std::move(event));
     }
     
@@ -138,9 +149,29 @@ namespace ertool {
     {
       hOut->Fill(std::move(event));
     }
+    
+    for(auto & event : XVertex)
+    {
+      hX->Fill(std::move(event));
+    }
+    
+    for(auto & event : YVertex)
+    {
+      hY->Fill(std::move(event));
+    }
+    
+    for(auto & event : ZVertex)
+    {
+      hZ->Fill(std::move(event));
+    }
+    
     hInTPC->Write();
     hInCryo->Write();
     hOut->Write();
+    
+    hX->Write();
+    hY->Write();
+    hZ->Write();
     
     fout->Close();
   }

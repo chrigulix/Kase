@@ -69,6 +69,9 @@ namespace ertool {
     std::vector<float> InTPCEnergy;
     std::vector<float> InCryostatEnergy;
     std::vector<float> OutsideEnergy;
+    std::vector<float> XVertex;
+    std::vector<float> YVertex;
+    std::vector<float> ZVertex;
   };
 }
 #endif

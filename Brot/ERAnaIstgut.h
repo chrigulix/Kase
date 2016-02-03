@@ -21,6 +21,9 @@
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoCylinder.h"
 
+#include "TH1.h"
+
+class TH1F;
 namespace ertool {
 
   /**
@@ -50,7 +53,7 @@ namespace ertool {
     bool Analyze(const EventData &data, const ParticleGraph &ps);
 
     /// Called after processing the last event sample
-    void ProcessEnd(TFile* fout=nullptr);
+    void ProcessEnd(TFile* fout);
     
   private:
     
@@ -62,7 +65,10 @@ namespace ertool {
     // Detector Box object
     geoalgo::AABox DetectorBox;
     geoalgo::Cylinder Cryostat;
-
+    
+    std::vector<float> InTPCEnergy;
+    std::vector<float> InCryostatEnergy;
+    std::vector<float> OutsideEnergy;
   };
 }
 #endif

@@ -86,18 +86,23 @@ namespace ertool {
 	  if(DetectorBox.Contain(particle.Vertex()))
 	  {
 	    std::cout << "Is inside TPC" << particle.Vertex() << std::endl;
+	    InTPCEnergy.push_back(particle.Energy());
 	  }
 	  else
 	  {
 	    std::cout << "Is outside TPC" << particle.Vertex() << std::endl;
             
             // Check if the particle is originating in the Cryostat 
-            if(Cryostat.Contain (particle.Vertex ())){
+            if(Cryostat.Contain (particle.Vertex ()))
+	    {
                 std::cout << "Is inside Cryostat " << particle.Vertex() << std::endl;
-              }
-            else {
+		InCryostatEnergy.push_back(particle.Energy());
+	    }
+            else 
+	    {
                 std::cout << "Is outside Cryostat " << particle.Vertex() << std::endl;
-              }
+		OutsideEnergy.push_back(particle.Energy());
+	    }
 	  }
 	}
       }
@@ -113,8 +118,31 @@ namespace ertool {
   }
 
   void ERAnaIstgut::ProcessEnd(TFile* fout)
-  {
-   
+  { 
+    fout = new TFile("Kasebrot.root","RECREATE");
+    fout->cd();
+    TH1F* hInTPC = new TH1F("In TPC","In TPC",20,0,3000);
+    TH1F* hInCryo = new TH1F("In Cryo","In Cryo",20,0,3000);
+    TH1F* hOut = new TH1F("Outside","Outside",20,0,3000);
+    for(auto & event : InTPCEnergy)
+    {
+      hInTPC->Fill(std::move(event));
+    }
+    
+    for(auto & event : InCryostatEnergy)
+    {
+      hInCryo->Fill(std::move(event));
+    }
+    
+    for(auto & event : OutsideEnergy)
+    {
+      hOut->Fill(std::move(event));
+    }
+    hInTPC->Write();
+    hInCryo->Write();
+    hOut->Write();
+    
+    fout->Close();
   }
 
 }

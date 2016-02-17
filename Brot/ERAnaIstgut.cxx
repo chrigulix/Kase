@@ -90,24 +90,18 @@ namespace ertool {
 // 	    std::cout << "Is inside TPC" << particle.Vertex() << std::endl;
 	    InTPCEnergy.push_back(particle.Energy());
 	  }
-	  else
+	  // Check if the particle is originating in the Cryostat
+	  else if(Cryostat.Contain (particle.Vertex ()))
+	  { 
+	    InCryostatEnergy.push_back(particle.Energy());
+	    
+	    XVertex.push_back(particle.Vertex().at(0));
+	    YVertex.push_back(particle.Vertex().at(1));
+	    ZVertex.push_back(particle.Vertex().at(2));
+	  }
+	  else 
 	  {
-// 	    std::cout << "Is outside TPC" << particle.Vertex() << std::endl;
-            
-            // Check if the particle is originating in the Cryostat 
-            if(Cryostat.Contain (particle.Vertex ()))
-	    {
-//                 std::cout << "Is inside Cryostat " << particle.Vertex() << std::endl;
-		InCryostatEnergy.push_back(particle.Energy());
-		XVertex.push_back(particle.Vertex().at(0));
-		YVertex.push_back(particle.Vertex().at(1));
-		ZVertex.push_back(particle.Vertex().at(2));
-	    }
-            else 
-	    {
-//                 std::cout << "Is outside Cryostat " << particle.Vertex() << std::endl;
-		OutsideEnergy.push_back(particle.Energy());
-	    }
+	    OutsideEnergy.push_back(particle.Energy());
 	  }
 	}
       }

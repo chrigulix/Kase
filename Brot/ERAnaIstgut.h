@@ -62,6 +62,10 @@ namespace ertool {
     // Number of out of TPC neutrinos
     unsigned int _outTPC;
     
+    // Number of Events
+    unsigned long int _NumberOfEvents = 0;
+    unsigned long int _NumberOfPrimaryFlashes = 0;
+    
     // Detector Box object
     geoalgo::AABox DetectorBox;
     geoalgo::Cylinder Cryostat;

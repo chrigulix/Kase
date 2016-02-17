@@ -41,14 +41,16 @@ namespace ertool {
 
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &graph)
   {
-    // Get the MC graph
-//     std::cout << " --------- starting loop: --------------" << std::endl;
+    _NumberOfEvents++;
         
     // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     // Get the MC data
     auto const& mc_data = MCEventData();
     
+    auto const & EventNumber = data.Event_ID();
+    
+    unsigned int EventNumeberTag = std::numeric_limits< unsigned int >::max();
 //     std::cout << mc_graph.Diagram() << std::endl;
     
     // particlegraph.GetParticle( particle.Ancestor() ).FlashID()
@@ -57,13 +59,19 @@ namespace ertool {
     {
       if(graph.GetParticle(particle.Ancestor()).ProcessType() != kCosmic)
       {
+	if(EventNumber != EventNumeberTag)
+	{
+	  _NumberOfPrimaryFlashes++;
+	  EventNumeberTag = EventNumber;
+	}
+	
 	if(particle.RecoType() == RecoType_t::kTrack)
 	{
 // 	  try{
 
 // 	  auto const flash = data.Flash( graph.GetParticle(particle.Ancestor()).FlashID() );
-	  auto const time = data.Track(particle.RecoID())._time;
-	  /*if(particle.ID() != particle.Ancestor())*/ std::cout << "time:  " << particle.RecoID() << " " << particle.ID() << " " << particle.Ancestor() << " " <<  data.Flash(graph.GetParticle(particle.Ancestor())).FlashID() << std::endl;
+	  auto const time = data.Track(particle.RecoID())._time; 
+// 	  std::cout << "time:  " << particle.RecoID() << " " << particle.ID() << " " << particle.Ancestor() << " " <<  data.Flash(graph.GetParticle(particle.Ancestor())).FlashID() << std::endl;
 // 	  std::cout << "time:  " << particle.RecoID() << " " << time << " " << flash._t << std::endl;
 // 	  } catch (ERException &e ) {}
 // 	auto const flash = data.Flash(particle.RecoID());
@@ -137,7 +145,11 @@ namespace ertool {
   }
 
   void ERAnaIstgut::ProcessEnd(TFile* fout)
-  { 
+  {
+    
+    std::cout << "Total number of Events: " << _NumberOfEvents << std::endl;
+    std::cout << "Number of recognized nu events: " << _NumberOfPrimaryFlashes << std::endl;
+    
     fout = new TFile("Kasebrot.root","RECREATE");
     fout->cd();
     TH1F* hInTPC = new TH1F("In TPC","In TPC",40,0,4000);

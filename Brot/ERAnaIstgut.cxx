@@ -51,15 +51,35 @@ namespace ertool {
     
 //     std::cout << mc_graph.Diagram() << std::endl;
     
+    // particlegraph.GetParticle( particle.Ancestor() ).FlashID()
     // Loop over particle set
     for(auto const & particle : graph.GetParticleArray())
     {
-      if(particle.RecoType() == RecoType_t::kTrack)
+      if(graph.GetParticle(particle.Ancestor()).ProcessType() != kCosmic)
       {
-	auto const flash = data.Track(particle);
-	//std::cout << "time:  " << flash._time << std::endl;
+	if(particle.RecoType() == RecoType_t::kTrack)
+	{
+// 	  try{
+
+// 	  auto const flash = data.Flash( graph.GetParticle(particle.Ancestor()).FlashID() );
+	  auto const time = data.Track(particle.RecoID())._time;
+	  /*if(particle.ID() != particle.Ancestor())*/ std::cout << "time:  " << particle.RecoID() << " " << particle.ID() << " " << particle.Ancestor() << " " <<  data.Flash(graph.GetParticle(particle.Ancestor())).FlashID() << std::endl;
+// 	  std::cout << "time:  " << particle.RecoID() << " " << time << " " << flash._t << std::endl;
+// 	  } catch (ERException &e ) {}
+// 	auto const flash = data.Flash(particle.RecoID());
+      
+// 	auto const time = data.Track(particle.RecoID())._time;
+//       auto const mcflash = mc_data.Flash(particle);
+      
+	  
+	}
       }
     }
+    
+//     for(auto const & flash : data.Flash())
+//     {
+//       std::cout << "Flash time " << flash._t << std::endl; 
+//     }
     
     // Loop over monte carlo particle set
     for(auto const & particle : mc_graph.GetParticleArray())

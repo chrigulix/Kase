@@ -1,6 +1,8 @@
 #ifndef ERTOOL_ERANAISTGUT_CXX
 #define ERTOOL_ERANAISTGUT_CXX
 
+#include <fstream>
+
 #include "ERAnaIstgut.h"
 
 namespace ertool {
@@ -41,29 +43,43 @@ namespace ertool {
 
   bool ERAnaIstgut::Analyze(const EventData &data, const ParticleGraph &graph)
   {
+     
+    // ========================================================================
+    // ============================== DATA PART ===============================
+    // ========================================================================
     _NumberOfEvents++;
-        
-    // Get MC particle set
-    auto const& mc_graph = MCParticleGraph();
-    // Get the MC data
-    auto const& mc_data = MCEventData();
-    
     auto const & EventNumber = data.Event_ID();
     
-    unsigned int EventNumeberTag = std::numeric_limits< unsigned int >::max();
 //     std::cout << mc_graph.Diagram() << std::endl;
     
     // particlegraph.GetParticle( particle.Ancestor() ).FlashID()
     // Loop over particle set
+    
+//    std::cout << "---------------- Event: " << data.Event_ID() << " ----------------" << std::endl;
+    
+    // set of flashes that are tagged as primary
+    std::set< FlashID_t > TaggedAncestors;
+    
     for(auto const & particle : graph.GetParticleArray())
-    {
-      if(graph.GetParticle(particle.Ancestor()).ProcessType() != kCosmic)
+    { 
+      // only the ancestor (base particle) has the tpc - flash matched information
+      auto Ancestor = graph.GetParticle(particle.Ancestor());
+      
+      // all non matched base particles get the kCosmic tag 
+      if(Ancestor.ProcessType() != kCosmic)
       {
-	if(EventNumber != EventNumeberTag)
+        // Make sure we only count base particles once.
+	if((TaggedAncestors.empty()) || (TaggedAncestors.find(data.Flash(Ancestor).FlashID()) == TaggedAncestors.end()))
 	{
 	  _NumberOfPrimaryFlashes++;
-	  EventNumeberTag = EventNumber;
+          TaggedAncestors.insert(data.Flash(Ancestor).FlashID());
 	}
+        
+//	 std::cout << "part reco ID:  " << particle.RecoID() << "\n" 
+//		    << "ancestor flash id:  " <<  data.Flash(graph.GetParticle(particle.Ancestor())).FlashID() << "\n "
+//		    << "part flash time:  " << data.Flash(graph.GetParticle(particle.Ancestor()))._t << "\n " 
+//		    << std::endl;
+	
 	
 	if(particle.RecoType() == RecoType_t::kTrack)
 	{
@@ -71,7 +87,7 @@ namespace ertool {
 
 // 	  auto const flash = data.Flash( graph.GetParticle(particle.Ancestor()).FlashID() );
 	  auto const time = data.Track(particle.RecoID())._time; 
-// 	  std::cout << "time:  " << particle.RecoID() << " " << particle.ID() << " " << particle.Ancestor() << " " <<  data.Flash(graph.GetParticle(particle.Ancestor())).FlashID() << std::endl;
+ 	 
 // 	  std::cout << "time:  " << particle.RecoID() << " " << time << " " << flash._t << std::endl;
 // 	  } catch (ERException &e ) {}
 // 	auto const flash = data.Flash(particle.RecoID());
@@ -84,10 +100,14 @@ namespace ertool {
       }
     }
     
-//     for(auto const & flash : data.Flash())
-//     {
-//       std::cout << "Flash time " << flash._t << std::endl; 
-//     }
+    
+    // ========================================================================
+    // =============================== MC PART ================================
+    // ========================================================================
+    // Get MC particle set
+    auto const& mc_graph = MCParticleGraph();
+    // Get the MC data
+    auto const& mc_data = MCEventData();
     
     // Loop over monte carlo particle set
     for(auto const & particle : mc_graph.GetParticleArray())
@@ -120,7 +140,22 @@ namespace ertool {
 	  }
 	  // Check if the particle is originating in the Cryostat
 	  else if(Cryostat.Contain (particle.Vertex ()))
-	  { 
+	  {
+            // loop over actual data events here to see what our analysis did
+            for (auto const & interesting : graph.GetParticleArray())
+            {
+                    //std::cout << "interesting (in cryo)" << std::endl;
+                    //std::cout << "pdg: " << interesting.PdgCode() << std::endl;
+                    //std::cout << "reco obj: " << interesting.RecoType() << std::endl;
+                    
+                    // was this tagged as a kCosmic during the analysis --> we ignore this event
+                    if ( !(interesting.RecoType() == kCosmic))
+                    {
+                      std::cout << "whoops " << data.Flash(interesting.Ancestor()).FlashID() << std::endl;
+                      std::cout << "whoops " << data.Flash(interesting.Ancestor())._t << std::endl;  
+                    } 
+            }
+            
 	    InCryostatEnergy.push_back(particle.Energy());
 	    
 	    XVertex.push_back(particle.Vertex().at(0));

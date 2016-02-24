@@ -40,13 +40,37 @@ namespace ertool {
     auto const& mc_data = MCEventData();
     
     // Check if we found a neutrino during reconstruction
-    std::cout << "---------------- Event: " << data.Event_ID() << " ----------------" << std::endl;
+//     std::cout << "---------------- Event: " << data.Event_ID() << " ----------------" << std::endl;
     for (auto const & particle : graph.GetParticleArray()) 
     {
-      if (particle.PdgCode() == 12) 
+      // only the ancestor (base particle) has the tpc - flash matched information
+      auto Ancestor = graph.GetParticle(particle.Ancestor());
+      
+      if (particle.PdgCode() == 12 && Ancestor.ProcessType() != kCosmic) 
       {
 	bool IsNeutrino = MCChecker(particle,data,graph,mc_data,mc_graph,12);
+	
+// 	std::cout << "MC GRAPH ------------------------------------------------------------" << std::endl;
+// 	std::cout << mc_graph.Diagram() << std::endl;
+// 	std::cout << "GRAPH ------------------------------------------------------------" << std::endl;
+// 	std::cout << graph.Diagram() << std::endl;
 	std::cout << "Neutrino: " << particle.ID() << " " << IsNeutrino << std::endl;
+// 	exit(1);
+      }
+    }
+    
+    for (auto const & mc_particle : mc_graph.GetParticleArray()) 
+    {
+      if(mc_particle.PdgCode() == 12)
+      {
+	bool IsNeutrino = MCChecker(mc_particle,data,graph,mc_data,mc_graph,12);
+	
+// 	std::cout << "MC GRAPH ------------------------------------------------------------" << std::endl;
+// 	std::cout << mc_graph.Diagram() << std::endl;
+// 	std::cout << "GRAPH ------------------------------------------------------------" << std::endl;
+// 	std::cout << graph.Diagram() << std::endl;
+	std::cout << "Neutrino: " << particle.ID() << " " << IsNeutrino << std::endl;
+// 	exit(1);
       }
     }
     
@@ -77,10 +101,12 @@ namespace ertool {
       {
 	if(MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() == PDGCode)
 	{
+	  std::cout << "PDG code if not missID " << MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() << std::endl;
 	  return true;
 	}
 	else
 	{
+	  std::cout << "PDG code if missID MCPrimary: " << MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() << " PDG code of child " << MCParticle.PdgCode() << std::endl;
 	  return false;
 	}
       }

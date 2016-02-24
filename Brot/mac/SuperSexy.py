@@ -43,7 +43,7 @@ my_proc.set_io_mode(fmwk.storage_manager.kREAD)
 #my_algo = ertool.AlgoBase()
 
 # Create ERTool analysis (empty base class for this example)
-my_ana = ertool.ERAnaIstgut()
+my_ana = ertool.ERAnaSuperSexy()
 
 # Create larlite interfce analysis unit for ERTool
 my_anaunit = GetERSelectionInstance()

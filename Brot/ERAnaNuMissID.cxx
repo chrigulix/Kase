@@ -48,13 +48,13 @@ namespace ertool {
       
       if (particle.PdgCode() == 12 && Ancestor.ProcessType() != kCosmic) 
       {
-	bool IsNeutrino = MCChecker(particle,data,graph,mc_data,mc_graph,12);
+// 	bool IsNeutrino = MCChecker(particle,data,graph,mc_data,mc_graph,12);
 	
 // 	std::cout << "MC GRAPH ------------------------------------------------------------" << std::endl;
 // 	std::cout << mc_graph.Diagram() << std::endl;
 // 	std::cout << "GRAPH ------------------------------------------------------------" << std::endl;
 // 	std::cout << graph.Diagram() << std::endl;
-	std::cout << "Neutrino: " << particle.ID() << " " << IsNeutrino << std::endl;
+// 	std::cout << "Found Nu: " << particle.ID() << " " << IsNeutrino << std::endl;
 // 	exit(1);
       }
     }
@@ -63,13 +63,13 @@ namespace ertool {
     {
       if(mc_particle.PdgCode() == 12)
       {
-	bool IsNeutrino = MCChecker(mc_particle,data,graph,mc_data,mc_graph,12);
+	bool IsNeutrino = MCChecker(mc_particle,mc_data,mc_graph,data,graph,12);
 	
 // 	std::cout << "MC GRAPH ------------------------------------------------------------" << std::endl;
 // 	std::cout << mc_graph.Diagram() << std::endl;
 // 	std::cout << "GRAPH ------------------------------------------------------------" << std::endl;
 // 	std::cout << graph.Diagram() << std::endl;
-	std::cout << "Neutrino: " << particle.ID() << " " << IsNeutrino << std::endl;
+	std::cout << "Not Found Nu: " << mc_particle.ID() << " " << IsNeutrino << std::endl;
 // 	exit(1);
       }
     }
@@ -83,23 +83,30 @@ namespace ertool {
   bool ERAnaNuMissID::MCChecker(const Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode)
   {
     // Initialize the reco ID of the child particle
-    RecoID_t ChildRecoID;
+    RecoID_t ChildRecoID = std::numeric_limits<RecoID_t>::max();
     
     for(auto const & ChildNodeID : ParticleToCheck.Children())
     {
       Particle Child = Graph.GetParticle(ChildNodeID);
+      std::cout << "Children " << Child.RecoID() << " RecoType " << Child.RecoType() <<  " PDG " << Child.PdgCode() << " Decendant " << Child.Descendant() << " No Children " << ParticleToCheck.Children().size() << std::endl;
       if(Child.RecoType() ==  RecoType_t::kTrack || Child.RecoType() ==  RecoType_t::kShower)
       {
 	ChildRecoID = Child.RecoID();
 	break;
       }
     }
+    // TODO needs to be changed
+    if(ChildRecoID == std::numeric_limits<RecoID_t>::max())
+    {
+      return false;
+    }
     
     for(auto const& MCParticle : MCGraph.GetParticleArray())
     {
+//       std::cout << "RecoIDs: " << MCParticle.RecoID() << " " << ChildRecoID << std::endl;
       if(MCParticle.RecoID() == ChildRecoID)
       {
-	if(MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() == PDGCode)
+	if(abs( MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() ) == PDGCode)
 	{
 	  std::cout << "PDG code if not missID " << MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() << std::endl;
 	  return true;

@@ -33,26 +33,32 @@ namespace ertool {
   }
 
   bool ERAnaNuMissID::Analyze(const EventData &data, const ParticleGraph &graph)
-  { 
-    // Check if we found a neutrino during reconstruction
-		std::cout << "---------------- Event: " << data.Event_ID() << " ----------------" << std::endl;
-		for (auto const & particle : graph.GetParticleArray()) {
-			if (particle.RecoType() != RecoType_t::kTrack) {
-				if (particle.PdgCode() == 12) {
-					std::cout << "Neurino: " << particle.ID() << std::endl;
-				}
-				
-			}
-			
-		}
+  {
+     // Get MC particle set
+    auto const& mc_graph = MCParticleGraph();
+    // Get the MC data
+    auto const& mc_data = MCEventData();
     
-    return true; }
+    // Check if we found a neutrino during reconstruction
+    std::cout << "---------------- Event: " << data.Event_ID() << " ----------------" << std::endl;
+    for (auto const & particle : graph.GetParticleArray()) 
+    {
+      if (particle.PdgCode() == 12) 
+      {
+	bool IsNeutrino = MCChecker(particle,data,graph,mc_data,mc_graph,12);
+	std::cout << "Neutrino: " << particle.ID() << " " << IsNeutrino << std::endl;
+      }
+    }
+    
+    return true;
+  }
 
   void ERAnaNuMissID::ProcessEnd(TFile* fout)
   {}
   
-  bool ERAnaNuMissID::MCChecker(Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode)
+  bool ERAnaNuMissID::MCChecker(const Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode)
   {
+    // Initialize the reco ID of the child particle
     RecoID_t ChildRecoID;
     
     for(auto const & ChildNodeID : ParticleToCheck.Children())
@@ -78,9 +84,11 @@ namespace ertool {
 	  return false;
 	}
       }
-    }
+    } // loop over mc graph particles
+    
+    // The code shouldn't run to this point. Either there is a neutrion in the event or not!
     throw ERException(Form("There is something wrong, go and strangle Christoph and Matthias!"));
-  }
+  } // MCChecker
   
 }
 

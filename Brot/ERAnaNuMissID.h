@@ -53,7 +53,7 @@ namespace ertool {
     void ProcessEnd(TFile* fout=nullptr);
     
     /// Check if MCPDG corresponds to RecoPDG
-    bool MCChecker(Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode);
+    bool MCChecker(const Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode);
     
   private:
     

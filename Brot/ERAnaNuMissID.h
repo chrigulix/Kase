@@ -16,6 +16,10 @@
 #define ERTOOL_ERANANUMISSID_H
 
 #include "ERTool/Base/AnaBase.h"
+#include "ERTool/Base/Flash.h"
+#include "LArUtil/Geometry.h"
+#include "GeoAlgo/GeoAlgo.h"
+#include "GeoAlgo/GeoCylinder.h"
 
 namespace ertool {
 
@@ -49,7 +53,19 @@ namespace ertool {
     void ProcessEnd(TFile* fout=nullptr);
     
     /// Check if MCPDG corresponds to RecoPDG
-    bool MCChecker(Particle ParticleToCheck, const int PDGCode);
+    bool MCChecker(Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode);
+    
+  private:
+    
+    /// Number of in TPC neutrinos
+    unsigned int _inTPC;
+    /// Number of out of TPC neutrinos
+    unsigned int _outTPC;
+    
+    /// Detector Box object
+    geoalgo::AABox DetectorBox;
+    geoalgo::Cylinder Cryostat;
+    
 
   };
 }

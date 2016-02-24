@@ -15,9 +15,24 @@ namespace ertool {
   {}
 
   void ERAnaNuMissID::ProcessBegin()
-  {}
+  {
+    _inTPC = 0;
+    _outTPC = 0;
+    
+    auto DetGeometry = ::larutil::Geometry::GetME(); 
+    
+    DetectorBox = geoalgo::AABox(0.0,-DetGeometry->DetHalfHeight(),0.0,
+                                 2*DetGeometry->DetHalfWidth(),DetGeometry->DetHalfHeight(),DetGeometry->DetLength());
+    
+    // Distance of Cryostat wall to TPC on the cylinder axis
+    double D = (DetGeometry->CryostatLength() - DetGeometry->DetLength())/2.0;
+    
+    Cryostat = geoalgo::Cylinder(DetGeometry->DetHalfWidth(), 0.0, -D,
+                                 DetGeometry->DetHalfWidth(), 0.0, DetGeometry->CryostatLength() - D,
+                                 DetGeometry->CryostatHalfHeight());
+  }
 
-  bool ERAnaNuMissID::Analyze(const EventData &data, const ParticleGraph &ps)
+  bool ERAnaNuMissID::Analyze(const EventData &data, const ParticleGraph &graph)
   { 
     // Check if we found a neutrino during reconstruction
 		std::cout << "---------------- Event: " << data.Event_ID() << " ----------------" << std::endl;
@@ -36,13 +51,13 @@ namespace ertool {
   void ERAnaNuMissID::ProcessEnd(TFile* fout)
   {}
   
-  bool ERAnaNuMissID::MCChecker(Particle& ParticleToCheck, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode)
+  bool ERAnaNuMissID::MCChecker(Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode)
   {
     RecoID_t ChildRecoID;
-    RecoType_t ChildRecoType;
     
-    for(const auto & Child : ParticleToCheck.Children())
+    for(auto const & ChildNodeID : ParticleToCheck.Children())
     {
+      Particle Child = Graph.GetParticle(ChildNodeID);
       if(Child.RecoType() ==  RecoType_t::kTrack || Child.RecoType() ==  RecoType_t::kShower)
       {
 	ChildRecoID = Child.RecoID();
@@ -54,7 +69,7 @@ namespace ertool {
     {
       if(MCParticle.RecoID() == ChildRecoID)
       {
-	if(MCGraph.GetParticle(MCParticle.Ancestor().PdgCode()) == PDGCode)
+	if(MCGraph.GetParticle(MCParticle.Ancestor()).PdgCode() == PDGCode)
 	{
 	  return true;
 	}

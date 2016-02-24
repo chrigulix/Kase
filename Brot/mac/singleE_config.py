@@ -16,7 +16,7 @@ def GetERSelectionInstance():
 	# Make an instance of ERAlgoFlashMatch using defaults defined in ertool_default(_mc).cfg
 	flashmatch_algo = ertool.ERAlgoFlashMatch()
 	flashmatch_algo.SetIgnoreShowers(False)
-	flashmatch_algo.SetIgnoreCosmics(False)
+	flashmatch_algo.SetIgnoreCosmics(True)
 
 	# Get Default CCSingleE Algorithm instance
 	# this information is loaded from:

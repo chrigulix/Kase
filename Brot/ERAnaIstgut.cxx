@@ -66,7 +66,7 @@ namespace ertool {
       auto Ancestor = graph.GetParticle(particle.Ancestor());
       
       // all non matched base particles get the kCosmic tag 
-      if(Ancestor.ProcessType() != kCosmic)
+      if(Ancestor.ProcessType() != kCosmic && Ancestor.PdgCode() == 12)
       {
         // Make sure we only count base particles once.
 	if((TaggedAncestors.empty()) || (TaggedAncestors.find(data.Flash(Ancestor).FlashID()) == TaggedAncestors.end()))
@@ -151,8 +151,8 @@ namespace ertool {
                     // was this tagged as a kCosmic during the analysis --> we ignore this event
                     if ( !(interesting.RecoType() == kCosmic))
                     {
-                      std::cout << "whoops " << data.Flash(interesting.Ancestor()).FlashID() << std::endl;
-                      std::cout << "whoops " << data.Flash(interesting.Ancestor())._t << std::endl;  
+//                       std::cout << "whoops " << data.Flash(interesting.Ancestor()).FlashID() << std::endl;
+//                       std::cout << "whoops " << data.Flash(interesting.Ancestor())._t << std::endl;  
                     } 
             }
             

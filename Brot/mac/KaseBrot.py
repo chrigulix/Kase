@@ -25,7 +25,7 @@ from seltool.algoviewer import viewAll
 
 # Create ana_processor instance
 my_proc = fmwk.ana_processor()
-my_proc.enable_filter(True)
+my_proc.enable_filter(False)
 
 use_reco = True if sys.argv[1] == 'reco' else False
 

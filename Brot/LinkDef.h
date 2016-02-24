@@ -11,6 +11,8 @@
 
 #pragma link C++ class sample+;
 #pragma link C++ class ertool::ERAnaIstgut+;
+#pragma link C++ class ertool::ERAnaNuMissID+;
 //ADD_NEW_CLASS ... do not change this line
 #endif
+
 

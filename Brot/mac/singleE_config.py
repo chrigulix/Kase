@@ -16,7 +16,7 @@ def GetERSelectionInstance():
 	# Make an instance of ERAlgoFlashMatch using defaults defined in ertool_default(_mc).cfg
 	flashmatch_algo = ertool.ERAlgoFlashMatch()
 	flashmatch_algo.SetIgnoreShowers(False)
-	flashmatch_algo.SetIgnoreCosmics(True)
+	flashmatch_algo.SetIgnoreCosmics(False)
 
 	# Get Default CCSingleE Algorithm instance
 	# this information is loaded from:
@@ -55,7 +55,7 @@ def GetERSelectionInstance():
 	#Ecut = 20 #temporary trying this to see if it helps pi0 mids at low energy
 
 	anaunit = fmwk.ExampleERSelection()
-	anaunit.setDisableXShift(True)
+	anaunit.setDisableXShift(False)
 
 	#By default for now using mcreco
 	anaunit.SetShowerProducer(True,'mcreco')

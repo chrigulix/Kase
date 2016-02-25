@@ -53,7 +53,7 @@ namespace ertool {
     void ProcessEnd(TFile* fout=nullptr);
     
     /// Check if MCPDG corresponds to RecoPDG
-    bool MCChecker(const Particle& ParticleToCheck, const EventData& Data, const ParticleGraph& Graph, const EventData& MCData, const ParticleGraph& MCGraph, const int PDGCode);
+    RecoID_t GetMCRecoID(const Particle& ParticleToCheck, const ParticleGraph& Graph, const ParticleGraph& MCGraph, const int PDGCode);
     
   private:
     
@@ -66,6 +66,9 @@ namespace ertool {
     geoalgo::AABox DetectorBox;
     geoalgo::Cylinder Cryostat;
     
+    std::vector<float> BITEandCosmicEnergy;
+    std::vector<float> BITEandDaugterEnergy;
+    std::vector<float> NuandCosmicEnergy;
 
   };
 }

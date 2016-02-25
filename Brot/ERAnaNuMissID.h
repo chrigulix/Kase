@@ -20,6 +20,8 @@
 #include "LArUtil/Geometry.h"
 #include "GeoAlgo/GeoAlgo.h"
 #include "GeoAlgo/GeoCylinder.h"
+#include <TH1.h>
+#include <THStack.h>
 
 namespace ertool {
 
@@ -69,6 +71,13 @@ namespace ertool {
     std::vector<float> BITEandCosmicEnergy;
     std::vector<float> BITEandDaugterEnergy;
     std::vector<float> NuandCosmicEnergy;
+    std::vector<float> SignalEnergy;
+    
+    THStack *hs = new THStack("hs","Miss ID");
+    
+    TH1F* BITECosmics = new TH1F("Bite And Cosmics","Bite And Cosmics",12,50,3000);
+    TH1F* BITEDaugter = new TH1F("Bite And Daughter","Bite And Daughter",12,50,3000);
+    TH1F* NuAndCosmic = new TH1F("Nu And Cosmic","Nu And Cosmic",12,50,3000);
 
   };
 }

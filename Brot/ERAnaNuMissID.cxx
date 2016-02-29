@@ -76,32 +76,36 @@ namespace ertool {
 	  if(MCParticle.RecoID() == ChildRecoID)
 	  {
 	    Particle MCAncestor = mc_graph.GetParticle(MCParticle.Ancestor());
-	    if( MCAncestor.RecoID() == std::numeric_limits<RecoID_t>::max()
+	    std::cout << "MC Ancestor ID: " << MCParticle.Ancestor() << " Reco ID: " << MCAncestor.RecoID() << " PDG Code: " << MCAncestor.PdgCode() << " Vertex: " << MCAncestor.Vertex() << std::endl;
+	    std::cout << "MC Particle ID: " << MCParticle.ID() << " Reco ID: " << MCParticle.RecoID() << " PDG Code: " << MCParticle.PdgCode() << " Vertex: " << MCParticle.Vertex() << std::endl;
+	    if( !(abs(MCAncestor.PdgCode()) == 12 || abs(MCAncestor.PdgCode()) == 14 || abs(MCAncestor.PdgCode()) == 16)
 	        && !DetectorBox.Contain(MCAncestor.Vertex()) && Cryostat.Contain(MCAncestor.Vertex())
 	        && (mc_data.Shower(MCParticle)._time < 0 || mc_data.Shower(MCParticle)._time > 1600) )
 	    {
 	      BITEandCosmicEnergy.push_back(data.Shower(ChildRecoID)._energy);
-	      std::cout << BITEandCosmicEnergy.back() << " " << mc_data.Shower(ChildRecoID)._energy << FoundBITE << std::endl;
+	      std::cout << "Bite And Cosmic: " << BITEandCosmicEnergy.back() << " " << mc_data.Shower(ChildRecoID)._energy << " " << particle.Energy() << std::endl;
 	      FoundBITE = true;
 	    }
-	    else if( (MCAncestor.PdgCode() == 12 || MCAncestor.PdgCode() == 14 || MCAncestor.PdgCode() == 16)
+	    else if( (abs(MCAncestor.PdgCode()) == 12 || abs(MCAncestor.PdgCode()) == 14 || abs(MCAncestor.PdgCode()) == 16)
 		   && !DetectorBox.Contain(MCAncestor.Vertex()) && Cryostat.Contain(MCAncestor.Vertex())
 		   && (mc_data.Shower(MCParticle)._time >= 0 || mc_data.Shower(MCParticle)._time <= 1600) )
 	    {
 	      BITEandDaugterEnergy.push_back(data.Shower(ChildRecoID)._energy);
-	      std::cout << BITEandDaugterEnergy.back() << " " << FoundBITE << std::endl;
+	      std::cout << "Bite And Daughter: " << BITEandDaugterEnergy.back() << " " << particle.Energy() << std::endl;
 	      FoundBITE = true;
 	    }
-	    else if(MCAncestor.PdgCode() == 12 && DetectorBox.Contain(MCAncestor.Vertex()))
+	    else if(abs(MCAncestor.PdgCode()) == 12 && DetectorBox.Contain(MCAncestor.Vertex()))
 	    {
 	      SignalEnergy.push_back(data.Shower(ChildRecoID)._energy);
-	      std::cout << "We have a signal! " << SignalEnergy.back() << std::endl;
+	      FoundBITE = true;
+	      std::cout << "We have a signal! " << SignalEnergy.back() << " " << particle.Energy() << std::endl;
 	    }
 	  }
 	} // loop over mc graph particles
 	
 	std::cout << "Found BITE? " << FoundBITE << std::endl;
 	
+	// TODO Something wrong!
 	if(!FoundBITE)
 	{
 	  for(auto const& MCParticle : mc_graph.GetParticleArray())
@@ -111,7 +115,7 @@ namespace ertool {
 	      && (mc_data.Shower(ChildRecoID)._time < 0 || mc_data.Shower(ChildRecoID)._time > 1600) )
 	    {
 	      NuandCosmicEnergy.push_back(data.Shower(ChildRecoID)._energy);
-	      std::cout << NuandCosmicEnergy.back() << std::endl;
+	      std::cout << "Nu And Cosmic: " << NuandCosmicEnergy.back() << " " << particle.Energy() << std::endl;
 	    }
 	  }
 	}
@@ -128,7 +132,7 @@ namespace ertool {
     
     for (auto const & mc_particle : mc_graph.GetParticleArray()) 
     {
-      if(mc_particle.PdgCode() == 12)
+      if(mc_particle.PdgCode() == 12 && mc_particle.PdgCode() == 14 && mc_particle.PdgCode() == 16)
       {
 // 	bool IsNeutrino = MCChecker(mc_particle,mc_data,mc_graph,data,graph,12);
 	

@@ -53,9 +53,7 @@ namespace ertool {
 
     /// Called after processing the last event sample
     void ProcessEnd(TFile* fout=nullptr);
-    
-    /// Check if MCPDG corresponds to RecoPDG
-    RecoID_t GetMCRecoID(const Particle& ParticleToCheck, const ParticleGraph& Graph, const ParticleGraph& MCGraph, const int PDGCode);
+
     
   private:
     
@@ -78,6 +76,8 @@ namespace ertool {
     TH1F* BITECosmics = new TH1F("Bite And Cosmics","Bite And Cosmics",50,50,1000);
     TH1F* BITEDaugter = new TH1F("Bite And Daughter","Bite And Daughter",50,50,1000);
     TH1F* NuAndCosmic = new TH1F("Nu And Cosmic","Nu And Cosmic",50,50,1000);
+    
+    double FancyPOTCalculator(unsigned int FileNumberStart, unsigned int FileNumberEnd);
 
   };
 }

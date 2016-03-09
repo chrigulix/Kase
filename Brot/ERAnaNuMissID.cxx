@@ -33,7 +33,7 @@ namespace ertool {
   }
 
   bool ERAnaNuMissID::Analyze(const EventData &data, const ParticleGraph &graph)
-  {   
+  {
      // Get MC particle set
     auto const& mc_graph = MCParticleGraph();
     // Get the MC data
@@ -61,12 +61,6 @@ namespace ertool {
 	    ChildRecoID = Child.RecoID();
 	    break;
 	  }
-	}
-	
-	// TODO needs to be changed
-	if(ChildRecoID == std::numeric_limits<RecoID_t>::max())
-	{
-//       return ChildRecoID;
 	}
 	
 	bool FoundBITE = false;
@@ -105,7 +99,7 @@ namespace ertool {
 	
 	std::cout << "Found BITE? " << FoundBITE << std::endl;
 	
-	// TODO Something wrong!
+	
 	if(!FoundBITE)
 	{
 	  for(auto const& MCParticle : mc_graph.GetParticleArray())
@@ -132,8 +126,11 @@ namespace ertool {
     
     for (auto const & mc_particle : mc_graph.GetParticleArray()) 
     {
-      if(mc_particle.PdgCode() == 12 && mc_particle.PdgCode() == 14 && mc_particle.PdgCode() == 16)
+      if(abs(mc_particle.PdgCode()) == 12 && abs(mc_particle.PdgCode()) == 14 && abs(mc_particle.PdgCode()) == 16)
       {
+	std::cout << mc_particle.Print() << std::endl;
+	
+	
 // 	bool IsNeutrino = MCChecker(mc_particle,mc_data,mc_graph,data,graph,12);
 	
 // 	std::cout << "MC GRAPH ------------------------------------------------------------" << std::endl;
@@ -173,40 +170,43 @@ namespace ertool {
     fout = new TFile("Bite.root","RECREATE");
     fout->cd();
     hs->Write();
+    
+    fout->Close();
+    
+    std::cout << FancyPOTCalculator(0,0) << std::endl;
   }
   
-  RecoID_t ERAnaNuMissID::GetMCRecoID(const Particle& ParticleToCheck, const ParticleGraph& Graph, const ParticleGraph& MCGraph, const int PDGCode)
+double ERAnaNuMissID::FancyPOTCalculator(unsigned int FileNumberStart, unsigned int FileNumberEnd)
+{
+  double TotPOT = 0;
+  
+  double FilePOT;
+  
+  for(unsigned int file_no = FileNumberStart; file_no <= FileNumberEnd; file_no++)
   {
-    // Initialize the reco ID of the child particle
-    RecoID_t ChildRecoID = std::numeric_limits<RecoID_t>::max();
+    std::string FileName = "/home/crohr/uBData/scan_prodgenie_bnb_nu_cosmic_uboone_mcc7_detsim_v1/larlite_mcinfo_";
+    std::stringstream FileNumber;
+    FileNumber << std::setfill('0') << std::setw(4) << file_no;
+    FileName += FileNumber.str() + ".root";
     
-    for(auto const & ChildNodeID : ParticleToCheck.Children())
-    {
-      Particle Child = Graph.GetParticle(ChildNodeID);
-      if(Child.RecoType() ==  RecoType_t::kTrack || Child.RecoType() ==  RecoType_t::kShower)
-      {
-	ChildRecoID = Child.RecoID();
-	break;
-      }
-    }
-    // TODO needs to be changed
-    if(ChildRecoID == std::numeric_limits<RecoID_t>::max())
-    {
-      return ChildRecoID;
-    }
+    TFile* InputFile = new TFile(FileName.c_str(),"READ");
+    InputFile->cd();
     
-    for(auto const& MCParticle : MCGraph.GetParticleArray())
-    {
-//       std::cout << "RecoIDs: " << MCParticle.RecoID() << " " << ChildRecoID << std::endl;
-      if(MCParticle.RecoID() == ChildRecoID)
-      {
-	return MCGraph.GetParticle(MCParticle.Ancestor()).RecoID();
-      }
-    } // loop over mc graph particles
+    TTree *POTTree = (TTree*)InputFile->Get("potsummary_generator_tree");
+    TBranch* TheBranch = POTTree->GetBranch('potsummary_generator_branch/totgoodpot');
+    TheBranch->SetAddress(&FilePOT);
+//     POTTree->SetBranchAddress("potsummary_generator_branch/totgoodpot",&FilePOT);
     
-    // The code shouldn't run to this point. Either there is a neutrion in the event or not!
-    throw ERException(Form("There is something wrong, go and strangle Christoph and Matthias!"));
-  } // MCChecker
+    for(unsigned int entry_no = 0; entry_no < POTTree->GetEntries(); entry_no++)
+    {
+      POTTree->GetEntry(entry_no);
+      std::cout <<  FilePOT << std::endl;
+      TotPOT += FilePOT;
+    } 
+  }
+  return TotPOT;
+}
+
   
 }
 

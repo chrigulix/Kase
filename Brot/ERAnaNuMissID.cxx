@@ -70,9 +70,8 @@ namespace ertool {
 	  if(MCParticle.RecoID() == ChildRecoID)
 	  {
 	    Particle MCAncestor = mc_graph.GetParticle(MCParticle.Ancestor());
-	    std::cout << "MC Ancestor ID: " << MCParticle.Ancestor() << " Reco ID: " << MCAncestor.RecoID() << " PDG Code: " << MCAncestor.PdgCode() << " Vertex: " << MCAncestor.Vertex() << std::endl;
-	    std::cout << "MC Particle ID: " << MCParticle.ID() << " Reco ID: " << MCParticle.RecoID() << " PDG Code: " << MCParticle.PdgCode() << " Vertex: " << MCParticle.Vertex() << std::endl;
 	    if( !(abs(MCAncestor.PdgCode()) == 12 || abs(MCAncestor.PdgCode()) == 14 || abs(MCAncestor.PdgCode()) == 16)
+	        && MCAncestor.PdgCode() != std::numeric_limits<int>::max()
 	        && !DetectorBox.Contain(MCAncestor.Vertex()) && Cryostat.Contain(MCAncestor.Vertex())
 	        && (mc_data.Shower(MCParticle)._time < 0 || mc_data.Shower(MCParticle)._time > 1600) )
 	    {
@@ -94,6 +93,12 @@ namespace ertool {
 	      FoundBITE = true;
 	      std::cout << "We have a signal! " << SignalEnergy.back() << " " << particle.Energy() << std::endl;
 	    }
+	    else if(MCAncestor.PdgCode() == std::numeric_limits<int>::max())
+	    {
+	      Unclassified.push_back(data.Shower(ChildRecoID)._energy);
+	      FoundBITE = true;
+	      std::cout << "Unclassified found: " << Unclassified.back() << " " << particle.Energy() << std::endl;
+	    }
 	  }
 	} // loop over mc graph particles
 	
@@ -105,11 +110,12 @@ namespace ertool {
 	  for(auto const& MCParticle : mc_graph.GetParticleArray())
 	  {
 	    if( (MCParticle.PdgCode() == 12 || MCParticle.PdgCode() == 14 || MCParticle.PdgCode() == 16) 
-	      && DetectorBox.Contain(MCParticle.Vertex())
+	      && DetectorBox.Contain(MCParticle.Vertex()) && !FoundBITE
 	      && (mc_data.Shower(ChildRecoID)._time < 0 || mc_data.Shower(ChildRecoID)._time > 1600) )
 	    {
 	      NuandCosmicEnergy.push_back(data.Shower(ChildRecoID)._energy);
 	      std::cout << "Nu And Cosmic: " << NuandCosmicEnergy.back() << " " << particle.Energy() << std::endl;
+	      FoundBITE = true;
 	    }
 	  }
 	}
@@ -159,32 +165,57 @@ namespace ertool {
     {
       NuAndCosmic->Fill(energy);
     }
+    for(auto const& energy : Unclassified)
+    {
+      Unclass->Fill(energy);
+    }
+    
+    Unclass->SetFillColor(kBlue);
     BITECosmics->SetFillColor(kRed);
-    BITEDaugter->SetFillColor(kBlue);
+    BITEDaugter->SetFillColor(kYellow);
     NuAndCosmic->SetFillColor(kGreen);
+    
+    double POTScalingFactor = 6.6e20/FancyPOTCalculator(0,499);
+    
+    std::cout << POTScalingFactor << std::endl;
+    
+    Unclass->Scale(POTScalingFactor);
+    BITECosmics->Scale(POTScalingFactor);
+    BITEDaugter->Scale(POTScalingFactor);
+    NuAndCosmic->Scale(POTScalingFactor);
     
     hs->Add(BITECosmics);
     hs->Add(BITEDaugter);
     hs->Add(NuAndCosmic);
+    hs->Add(Unclass);
+    
+    
     
     fout = new TFile("Bite.root","RECREATE");
     fout->cd();
+    fout->WriteObject<std::vector<float>>(&BITEandCosmicEnergy,"BITEandCosmicEnergy");
+    fout->WriteObject<std::vector<float>>(&BITEandDaugterEnergy,"BITEandDaugterEnergy");
+    fout->WriteObject<std::vector<float>>(&NuandCosmicEnergy,"NuandCosmicEnergy");
+    fout->WriteObject<std::vector<float>>(&Unclassified,"Unclassified");
+    fout->WriteObject<std::vector<float>>(&SignalEnergy,"SignalEnergy");
+//     fout->WriteObject<double>(&POTScalingFactor,"POTScalingFactor");
+    
     hs->Write();
     
     fout->Close();
     
-    std::cout << FancyPOTCalculator(0,0) << std::endl;
+//     std::cout << "Total POT " << FancyPOTCalculator(0,120) << std::endl;
   }
   
 double ERAnaNuMissID::FancyPOTCalculator(unsigned int FileNumberStart, unsigned int FileNumberEnd)
 {
   double TotPOT = 0;
   
-  double FilePOT;
+  Double_t FilePOT;
   
   for(unsigned int file_no = FileNumberStart; file_no <= FileNumberEnd; file_no++)
   {
-    std::string FileName = "/home/crohr/uBData/scan_prodgenie_bnb_nu_cosmic_uboone_mcc7_detsim_v1/larlite_mcinfo_";
+    std::string FileName = "/lheppc46/data/uBData/larlite_files/mcc7/scan_prodgenie_bnb_nu_cosmic_uboone_mcc7_detsim_v1/larlite_mcinfo_";
     std::stringstream FileNumber;
     FileNumber << std::setfill('0') << std::setw(4) << file_no;
     FileName += FileNumber.str() + ".root";
@@ -193,16 +224,22 @@ double ERAnaNuMissID::FancyPOTCalculator(unsigned int FileNumberStart, unsigned 
     InputFile->cd();
     
     TTree *POTTree = (TTree*)InputFile->Get("potsummary_generator_tree");
-    TBranch* TheBranch = POTTree->GetBranch('potsummary_generator_branch/totgoodpot');
-    TheBranch->SetAddress(&FilePOT);
-//     POTTree->SetBranchAddress("potsummary_generator_branch/totgoodpot",&FilePOT);
+    POTTree->SetMakeClass(1);
     
-    for(unsigned int entry_no = 0; entry_no < POTTree->GetEntries(); entry_no++)
+//     TBranch* TheBranch = POTTree->GetBranch("potsummary_generator_branch");
+    
+    TBranchElement *BranchEle = (TBranchElement*)POTTree->GetBranch("potsummary_generator_branch");
+    
+    TBranch* TheBranch = BranchEle->FindBranch("totgoodpot");
+    
+    TheBranch->SetAddress(&FilePOT);
+    
+    for(unsigned int entry_no = 0; entry_no < TheBranch->GetEntries(); entry_no++)
     {
-      POTTree->GetEntry(entry_no);
-      std::cout <<  FilePOT << std::endl;
+      TheBranch->GetEntry(entry_no);
       TotPOT += FilePOT;
-    } 
+    }
+    InputFile->Close();
   }
   return TotPOT;
 }

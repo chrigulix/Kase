@@ -22,6 +22,7 @@
 #include "GeoAlgo/GeoCylinder.h"
 #include <TH1.h>
 #include <THStack.h>
+#include <TBranchElement.h>
 
 namespace ertool {
 
@@ -69,6 +70,7 @@ namespace ertool {
     std::vector<float> BITEandCosmicEnergy;
     std::vector<float> BITEandDaugterEnergy;
     std::vector<float> NuandCosmicEnergy;
+    std::vector<float> Unclassified;
     std::vector<float> SignalEnergy;
     
     THStack *hs = new THStack("hs","Miss ID");
@@ -76,6 +78,7 @@ namespace ertool {
     TH1F* BITECosmics = new TH1F("Bite And Cosmics","Bite And Cosmics",50,50,1000);
     TH1F* BITEDaugter = new TH1F("Bite And Daughter","Bite And Daughter",50,50,1000);
     TH1F* NuAndCosmic = new TH1F("Nu And Cosmic","Nu And Cosmic",50,50,1000);
+    TH1F* Unclass = new TH1F("Nu And Cosmic","Nu And Cosmic",50,50,1000);
     
     double FancyPOTCalculator(unsigned int FileNumberStart, unsigned int FileNumberEnd);
 
